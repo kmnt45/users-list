@@ -53,11 +53,7 @@ export const Table: FC = () => {
         pagination={{ pageSize: 10 }}
       />
       {editingUser && (
-        <FormModal
-          editingUser={editingUser}
-          onCloseAction={() => setEditingUser(null)}
-          openButton={false}
-        />
+        <FormModal editingUser={editingUser} onCloseAction={() => setEditingUser(null)} openButton={false} />
       )}
     </div>
   );

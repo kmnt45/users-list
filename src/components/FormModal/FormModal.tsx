@@ -31,11 +31,7 @@ type FormModalProps = {
   openButton?: boolean;
 };
 
-export const FormModal: FC<FormModalProps> = ({
-  editingUser,
-  onCloseAction,
-  openButton = true,
-}) => {
+export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, openButton = true }) => {
   const dispatch = useAppDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -100,11 +96,7 @@ export const FormModal: FC<FormModalProps> = ({
             name='name'
             control={control}
             render={({ field, fieldState }) => (
-              <Form.Item
-                label='Имя'
-                validateStatus={fieldState.error ? 'error' : ''}
-                help={fieldState.error?.message}
-              >
+              <Form.Item label='Имя' validateStatus={fieldState.error ? 'error' : ''} help={fieldState.error?.message}>
                 <Input {...field} placeholder='Введите имя' />
               </Form.Item>
             )}
@@ -139,11 +131,7 @@ export const FormModal: FC<FormModalProps> = ({
             name='role'
             control={control}
             render={({ field, fieldState }) => (
-              <Form.Item
-                label='Роль'
-                validateStatus={fieldState.error ? 'error' : ''}
-                help={fieldState.error?.message}
-              >
+              <Form.Item label='Роль' validateStatus={fieldState.error ? 'error' : ''} help={fieldState.error?.message}>
                 <Select {...field} placeholder='Выберите роль'>
                   <Option value='Admin'>Admin</Option>
                   <Option value='User'>User</Option>
