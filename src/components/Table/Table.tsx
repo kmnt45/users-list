@@ -48,7 +48,7 @@ export const Table: FC = () => {
       <AntTable
         rowKey='id'
         columns={columns}
-        dataSource={users}
+        dataSource={[...users].reverse()}
         loading={loading}
         pagination={{ pageSize: 10 }}
       />
