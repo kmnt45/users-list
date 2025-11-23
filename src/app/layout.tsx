@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import { ClientProviders } from './providers/ClientProviders';
 
 import 'antd/dist/reset.css';
-import './globals.css';
+import './globals.scss';
 
 export const metadata: Metadata = {
   title: 'Список пользователей',
