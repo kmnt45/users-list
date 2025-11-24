@@ -26,6 +26,8 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   const { control, handleSubmit, reset } = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
     defaultValues: {
@@ -41,7 +43,6 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
     if (editingUser) {
       reset(editingUser);
 
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsModalOpen(true);
     }
   }, [editingUser, reset]);
@@ -56,20 +57,28 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
     onCloseAction?.();
   };
 
-  const onSubmit = (data: UserFormValues) => {
-    if (editingUser) {
-      dispatch(updateUser({ ...editingUser, ...data }));
-    } else {
-      dispatch(addUser(data));
-    }
+  const onSubmit = async (data: UserFormValues) => {
+    setLoading(true);
 
-    closeModal();
+    try {
+      if (editingUser) {
+        await dispatch(updateUser({ ...editingUser, ...data })).unwrap();
+      } else {
+        await dispatch(addUser(data)).unwrap();
+      }
+
+      closeModal();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       {openButton && (
-        <Button size='large' type='primary' onClick={openModal} icon={<UserAddOutlined />}>
+        <Button size='large' type='primary' onClick={openModal} icon={<UserAddOutlined />} loading={loading}>
           Добавить пользователя
         </Button>
       )}
