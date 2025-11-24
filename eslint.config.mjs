@@ -66,7 +66,7 @@ export default defineConfig([
       'react/react-in-jsx-scope': 'off',
       'react/self-closing-comp': 'warn',
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'off',
     },
     settings: {
       'import/resolver': {

@@ -4,7 +4,11 @@ import type { AxiosError } from 'axios';
 
 import type { User, NewUser } from '@/models';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!API_URL) {
+  throw new Error('Api url is not defined');
+}
 
 const usersUrl = (id?: number) => (id ? `${API_URL}/users/${id}` : `${API_URL}/users`);
 

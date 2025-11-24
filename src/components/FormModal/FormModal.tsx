@@ -4,26 +4,16 @@ import { type FC, useEffect, useState } from 'react';
 
 import { UserAddOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Modal, Button, Input, Select, Form } from 'antd';
-import { Controller, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { Modal, Button, Select, Form } from 'antd';
+import { useForm } from 'react-hook-form';
 
-import { addUser, updateUser } from '@/asyncThunks';
+import { FormField } from '@/components/FormField';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import type { User } from '@/models';
+import { addUser, updateUser } from '@/service';
+import { userSchema, type UserFormValues } from '@/validation';
 
 const { Option } = Select;
-
-const userSchema = z.object({
-  name: z.string().min(2, { message: 'Имя должно содержать минимум 2 символа' }),
-  email: z.string().email({ message: 'Введите корректный email' }),
-  phone: z.string().regex(/^(\+7|7|8)?[\s-]?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/, {
-    message: 'Введите корректный телефонный номер',
-  }),
-  role: z.enum(['Admin', 'User', 'Manager'] as const),
-});
-
-type UserFormValues = z.infer<typeof userSchema>;
 
 type FormModalProps = {
   editingUser?: User;
@@ -92,52 +82,19 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
         cancelText='Отмена'
       >
         <Form layout='vertical'>
-          <Controller
-            name='name'
-            control={control}
-            render={({ field, fieldState }) => (
-              <Form.Item label='Имя' validateStatus={fieldState.error ? 'error' : ''} help={fieldState.error?.message}>
-                <Input {...field} placeholder='Введите имя' />
-              </Form.Item>
-            )}
-          />
-          <Controller
-            name='email'
-            control={control}
-            render={({ field, fieldState }) => (
-              <Form.Item
-                label='Email'
-                validateStatus={fieldState.error ? 'error' : ''}
-                help={fieldState.error?.message}
-              >
-                <Input {...field} placeholder='Введите email' />
-              </Form.Item>
-            )}
-          />
-          <Controller
-            name='phone'
-            control={control}
-            render={({ field, fieldState }) => (
-              <Form.Item
-                label='Телефон'
-                validateStatus={fieldState.error ? 'error' : ''}
-                help={fieldState.error?.message}
-              >
-                <Input {...field} placeholder='Введите телефон' />
-              </Form.Item>
-            )}
-          />
-          <Controller
+          <FormField name='name' label='Имя' control={control} placeholder='Введите имя' />
+          <FormField name='email' label='Email' control={control} placeholder='Введите email' />
+          <FormField name='phone' label='Телефон' control={control} placeholder='Введите телефон' />
+          <FormField
             name='role'
+            label='Роль'
             control={control}
-            render={({ field, fieldState }) => (
-              <Form.Item label='Роль' validateStatus={fieldState.error ? 'error' : ''} help={fieldState.error?.message}>
-                <Select {...field} placeholder='Выберите роль'>
-                  <Option value='Admin'>Admin</Option>
-                  <Option value='User'>User</Option>
-                  <Option value='Manager'>Manager</Option>
-                </Select>
-              </Form.Item>
+            component={({ ...props }) => (
+              <Select {...props}>
+                <Option value='Admin'>Admin</Option>
+                <Option value='User'>User</Option>
+                <Option value='Manager'>Manager</Option>
+              </Select>
             )}
           />
         </Form>

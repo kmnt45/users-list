@@ -4,28 +4,39 @@ import { type FC, useEffect, useState } from 'react';
 
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Table as AntTable, Button, Space } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 
-import { fetchUsers, deleteUser } from '@/asyncThunks';
 import { FormModal } from '@/components/FormModal';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import type { User } from '@/models';
+import { fetchUsers, deleteUser } from '@/service';
+import { selectLoading, selectUsersReversed } from '@/slices';
 
 export const Table: FC = () => {
   const dispatch = useAppDispatch();
-  const { users, loading } = useAppSelector((state) => state.users);
+
+  const users = useAppSelector(selectUsersReversed);
+
+  const loading = useAppSelector(selectLoading);
 
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
   useEffect(() => {
     dispatch(fetchUsers());
-  }, [dispatch]);
+  }, []);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: number) => () => {
     dispatch(deleteUser(id));
   };
 
-  const columns = [
+  const handleClose = () => {
+    setEditingUser(null);
+  };
+
+  const handleEdit = (user: User) => () => setEditingUser(user);
+
+  const columns: ColumnsType<User> = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
     { title: 'Имя', dataIndex: 'name', key: 'name' },
     { title: 'Email', dataIndex: 'email', key: 'email' },
@@ -34,10 +45,10 @@ export const Table: FC = () => {
     {
       title: 'Действия',
       key: 'actions',
-      render: (_: unknown, record: User) => (
+      render: (_, record: User) => (
         <Space>
-          <Button icon={<EditOutlined />} onClick={() => setEditingUser(record)} type='default' />
-          <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
+          <Button icon={<EditOutlined />} onClick={handleEdit(record)} type='default' />
+          <Button icon={<DeleteOutlined />} onClick={handleDelete(record.id)} danger />
         </Space>
       ),
     },
@@ -45,16 +56,8 @@ export const Table: FC = () => {
 
   return (
     <div>
-      <AntTable
-        rowKey='id'
-        columns={columns}
-        dataSource={[...users].reverse()}
-        loading={loading}
-        pagination={{ pageSize: 10 }}
-      />
-      {editingUser && (
-        <FormModal editingUser={editingUser} onCloseAction={() => setEditingUser(null)} openButton={false} />
-      )}
+      <AntTable rowKey='id' columns={columns} dataSource={users} loading={loading} pagination={{ pageSize: 10 }} />
+      {editingUser && <FormModal editingUser={editingUser} onCloseAction={handleClose} openButton={false} />}
     </div>
   );
 };

@@ -1,7 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
 
-import { addUser, deleteUser, fetchUsers, updateUser } from '@/asyncThunks';
 import type { User } from '@/models';
+import { addUser, deleteUser, fetchUsers, updateUser } from '@/service';
+import type { RootState } from '@/store';
 
 type InitialState = {
   users: User[];
@@ -65,5 +66,15 @@ const usersSlice = createSlice({
       });
   },
 });
+
+export const selectUsersState = (state: RootState) => state.users;
+
+export const selectUsers = createSelector([selectUsersState], (usersState) => usersState.users);
+
+export const selectLoading = createSelector([selectUsersState], (usersState) => usersState.loading);
+
+export const selectError = createSelector([selectUsersState], (usersState) => usersState.error);
+
+export const selectUsersReversed = createSelector([selectUsers], (users) => [...users].reverse());
 
 export const usersReducer = usersSlice.reducer;
