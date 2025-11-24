@@ -10,7 +10,7 @@ if (!API_URL) {
   throw new Error('Api url is not defined');
 }
 
-const usersUrl = (id?: number) => (id ? `${API_URL}/users/${id}` : `${API_URL}/users`);
+const usersUrl = (id?: string) => (id ? `${API_URL}/users/${id}` : `${API_URL}/users`);
 
 export const fetchUsers = createAsyncThunk<User[], void, { rejectValue: string }>(
   'users/fetchUsers',
@@ -57,7 +57,7 @@ export const updateUser = createAsyncThunk<User, Partial<User>, { rejectValue: s
   },
 );
 
-export const deleteUser = createAsyncThunk<number, number, { rejectValue: string }>(
+export const deleteUser = createAsyncThunk<string, string, { rejectValue: string }>(
   'users/deleteUser',
   async (id, { rejectWithValue }) => {
     try {

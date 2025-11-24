@@ -3,10 +3,11 @@
 import { type FC, useEffect, useState } from 'react';
 
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Table as AntTable, Button, Space, Tooltip, InputNumber } from 'antd';
+import { Table as AntTable, Button, Space, InputNumber } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 import { FormModal } from '@/components/FormModal';
+import { Tooltip } from '@/components/Tooltip';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import type { User } from '@/models';
@@ -30,7 +31,7 @@ export const Table: FC = () => {
     dispatch(fetchUsers());
   }, []);
 
-  const handleDelete = (id: number) => () => {
+  const handleDelete = (id: string) => () => {
     dispatch(deleteUser(id));
   };
 
@@ -52,14 +53,24 @@ export const Table: FC = () => {
     setCurrentPage(1);
   };
 
+  const emailFilters = Array.from(new Set(users.map((user) => user.email.split('@')[1]))).map((domain) => ({
+    text: domain,
+    value: domain,
+  }));
+
+  const roleFilters = Array.from(new Set(users.map((user) => user.role))).map((role) => ({
+    text: role,
+    value: role,
+  }));
+
   const columns: ColumnsType<User> = [
     {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 60,
+      width: 50,
       showSorterTooltip: false,
-      sorter: (a, b) => a.id - b.id,
+      sorter: (a, b) => Number(a.id) - Number(b.id),
     },
     {
       title: 'Имя',
@@ -68,7 +79,7 @@ export const Table: FC = () => {
       width: 150,
       ellipsis: { showTitle: false },
       showSorterTooltip: false,
-      render: (name) => <Tooltip title={name}>{name}</Tooltip>,
+      render: (name) => <Tooltip title={name} />,
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
@@ -78,12 +89,9 @@ export const Table: FC = () => {
       width: 200,
       ellipsis: { showTitle: false },
       showSorterTooltip: false,
-      render: (email) => <Tooltip title={email}>{email}</Tooltip>,
+      render: (email) => <Tooltip title={email} />,
       sorter: (a, b) => a.email.localeCompare(b.email),
-      filters: Array.from(new Set(users.map((u) => u.email.split('@')[1]))).map((domain) => ({
-        text: domain,
-        value: domain,
-      })),
+      filters: emailFilters,
       onFilter: (value, record) => record.email.endsWith(value as string),
     },
     {
@@ -93,7 +101,7 @@ export const Table: FC = () => {
       width: 140,
       ellipsis: { showTitle: false },
       showSorterTooltip: false,
-      render: (phone) => <Tooltip title={phone}>{phone}</Tooltip>,
+      render: (phone) => <Tooltip title={phone} />,
       sorter: (a, b) => a.phone.localeCompare(b.phone),
       filters: [
         { text: '+7', value: '+7' },
@@ -108,9 +116,9 @@ export const Table: FC = () => {
       width: 100,
       ellipsis: { showTitle: false },
       showSorterTooltip: false,
-      render: (role) => <Tooltip title={role}>{role}</Tooltip>,
+      render: (role) => <Tooltip title={role} />,
       sorter: (a, b) => a.role.localeCompare(b.role),
-      filters: Array.from(new Set(users.map((user) => user.role))).map((role) => ({ text: role, value: role })),
+      filters: roleFilters,
       onFilter: (value, record) => record.role === value,
     },
     {
@@ -119,7 +127,7 @@ export const Table: FC = () => {
       width: 120,
       render: (_, record: User) => (
         <Space>
-          <Button icon={<EditOutlined />} onClick={handleEdit(record)} type='default' />
+          <Button icon={<EditOutlined />} onClick={handleEdit(record)} />
           <Button icon={<DeleteOutlined />} onClick={handleDelete(record.id)} danger />
         </Space>
       ),
@@ -148,7 +156,6 @@ export const Table: FC = () => {
           </div>
         )}
       />
-
       {editingUser && <FormModal editingUser={editingUser} onCloseAction={handleClose} openButton={false} />}
     </div>
   );
