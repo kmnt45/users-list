@@ -53,14 +53,23 @@ export const Table: FC = () => {
   };
 
   const columns: ColumnsType<User> = [
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      width: 60,
+      showSorterTooltip: false,
+      sorter: (a, b) => a.id - b.id,
+    },
     {
       title: 'Имя',
       dataIndex: 'name',
       key: 'name',
       width: 150,
       ellipsis: { showTitle: false },
+      showSorterTooltip: false,
       render: (name) => <Tooltip title={name}>{name}</Tooltip>,
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: 'Email',
@@ -68,7 +77,14 @@ export const Table: FC = () => {
       key: 'email',
       width: 200,
       ellipsis: { showTitle: false },
+      showSorterTooltip: false,
       render: (email) => <Tooltip title={email}>{email}</Tooltip>,
+      sorter: (a, b) => a.email.localeCompare(b.email),
+      filters: Array.from(new Set(users.map((u) => u.email.split('@')[1]))).map((domain) => ({
+        text: domain,
+        value: domain,
+      })),
+      onFilter: (value, record) => record.email.endsWith(value as string),
     },
     {
       title: 'Телефон',
@@ -76,7 +92,14 @@ export const Table: FC = () => {
       key: 'phone',
       width: 140,
       ellipsis: { showTitle: false },
+      showSorterTooltip: false,
       render: (phone) => <Tooltip title={phone}>{phone}</Tooltip>,
+      sorter: (a, b) => a.phone.localeCompare(b.phone),
+      filters: [
+        { text: '+7', value: '+7' },
+        { text: '8', value: '8' },
+      ],
+      onFilter: (value, record) => record.phone.startsWith(value as string),
     },
     {
       title: 'Роль',
@@ -84,7 +107,11 @@ export const Table: FC = () => {
       key: 'role',
       width: 100,
       ellipsis: { showTitle: false },
+      showSorterTooltip: false,
       render: (role) => <Tooltip title={role}>{role}</Tooltip>,
+      sorter: (a, b) => a.role.localeCompare(b.role),
+      filters: Array.from(new Set(users.map((user) => user.role))).map((role) => ({ text: role, value: role })),
+      onFilter: (value, record) => record.role === value,
     },
     {
       title: 'Действия',
