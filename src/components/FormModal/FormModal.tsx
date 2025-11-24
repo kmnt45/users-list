@@ -60,14 +60,14 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
   const onSubmit = async (data: UserFormValues) => {
     setLoading(true);
 
+    closeModal();
+
     try {
       if (editingUser) {
         await dispatch(updateUser({ ...editingUser, ...data })).unwrap();
       } else {
         await dispatch(addUser(data)).unwrap();
       }
-
-      closeModal();
     } catch (error) {
       console.error(error);
     } finally {
@@ -78,7 +78,14 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
   return (
     <>
       {openButton && (
-        <Button size='large' type='primary' onClick={openModal} icon={<UserAddOutlined />} loading={loading}>
+        <Button
+          size='large'
+          type='primary'
+          onClick={openModal}
+          icon={<UserAddOutlined />}
+          loading={loading}
+          disabled={loading}
+        >
           Добавить пользователя
         </Button>
       )}
