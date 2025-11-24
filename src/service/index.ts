@@ -42,7 +42,7 @@ export const addUser = createAsyncThunk<User, NewUser, { rejectValue: string }>(
   },
 );
 
-export const updateUser = createAsyncThunk<User, User, { rejectValue: string }>(
+export const updateUser = createAsyncThunk<User, Partial<User>, { rejectValue: string }>(
   'users/updateUser',
   async (user, { rejectWithValue }) => {
     try {
