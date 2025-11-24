@@ -1,6 +1,6 @@
 # Тестовое задание: CRUD приложение на React
 
-Демонстарция: https://users-list-drab.vercel.app
+Демонстрация: https://users-list-drab.vercel.app
 
 ## Клонирование репозитория
 
