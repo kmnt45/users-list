@@ -8,6 +8,7 @@ import { Modal, Button, Select, Form } from 'antd';
 import { useForm } from 'react-hook-form';
 
 import { FormField } from '@/components/FormField';
+import { roles } from '@/constants';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import type { User } from '@/models';
 import { addUser, updateUser } from '@/service';
@@ -34,7 +35,7 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
       name: '',
       email: '',
       phone: '',
-      role: 'User',
+      role: roles[0],
     },
     mode: 'onBlur',
   });
@@ -107,9 +108,11 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
             control={control}
             component={({ ...props }) => (
               <Select {...props}>
-                <Option value='Admin'>Admin</Option>
-                <Option value='User'>User</Option>
-                <Option value='Manager'>Manager</Option>
+                {roles.map((role) => (
+                  <Option key={role} value={role}>
+                    {role}
+                  </Option>
+                ))}
               </Select>
             )}
           />
