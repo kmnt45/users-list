@@ -3,7 +3,7 @@
 import { type FC, useEffect, useState } from 'react';
 
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Table as AntTable, Button, Space, Tooltip } from 'antd';
+import { Table as AntTable, Button, Space, Tooltip, InputNumber } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 import { FormModal } from '@/components/FormModal';
@@ -22,6 +22,10 @@ export const Table: FC = () => {
 
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
+  const [pageSize, setPageSize] = useState(10);
+
+  const [currentPage, setCurrentPage] = useState(1);
+
   useEffect(() => {
     dispatch(fetchUsers());
   }, []);
@@ -35,6 +39,18 @@ export const Table: FC = () => {
   };
 
   const handleEdit = (user: User) => () => setEditingUser(user);
+
+  const handlePageChange = (page: number, size?: number) => {
+    setCurrentPage(page);
+
+    if (size) setPageSize(size);
+  };
+
+  const handlePageSizeChange = (value: number | null) => {
+    setPageSize(value || 1);
+
+    setCurrentPage(1);
+  };
 
   const columns: ColumnsType<User> = [
     { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
@@ -90,9 +106,22 @@ export const Table: FC = () => {
         columns={columns}
         dataSource={users}
         loading={loading}
-        pagination={{ pageSize: 10, showSizeChanger: false }}
+        pagination={{
+          current: currentPage,
+          pageSize,
+          showSizeChanger: false,
+          total: users.length,
+          onChange: handlePageChange,
+        }}
         scroll={{ x: '100%' }}
+        footer={() => (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
+            <span>Записей на странице:</span>
+            <InputNumber min={1} max={100} value={pageSize} onChange={handlePageSizeChange} style={{ width: 70 }} />
+          </div>
+        )}
       />
+
       {editingUser && <FormModal editingUser={editingUser} onCloseAction={handleClose} openButton={false} />}
     </div>
   );
