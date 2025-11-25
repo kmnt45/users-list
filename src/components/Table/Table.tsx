@@ -1,6 +1,6 @@
 'use client';
 
-import { type FC, useCallback, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 
 import { Table as AntTable } from 'antd';
 
@@ -38,22 +38,19 @@ export const Table: FC = () => {
     dispatch(fetchUsers());
   }, []);
 
-  const handleEdit = useCallback((user: User) => {
+  const handleEdit = (user: User) => {
     setEditingUser(user);
-  }, []);
+  };
 
-  const handleDelete = useCallback(
-    (user: User) => {
-      const subs = users.filter((u) => u.chiefId === user.id);
+  const handleDelete = (user: User) => {
+    const subs = users.filter((u) => u.chiefId === user.id);
 
-      setUserToDelete(user);
+    setUserToDelete(user);
 
-      setSubordinates(subs);
+    setSubordinates(subs);
 
-      setDeleteModalOpen(true);
-    },
-    [users],
-  );
+    setDeleteModalOpen(true);
+  };
 
   const columns = useColumns({
     users,
@@ -95,6 +92,10 @@ export const Table: FC = () => {
     setCurrentPage(1);
   };
 
+  const handleCloseFormModal = () => {
+    setEditingUser(null);
+  };
+
   return (
     <div>
       <AntTable
@@ -112,11 +113,7 @@ export const Table: FC = () => {
         scroll={{ x: '100%' }}
         footer={() => <PageSizeSelector pageSize={pageSize} onChange={handlePageSizeChange} />}
       />
-
-      {editingUser && (
-        <FormModal editingUser={editingUser} onCloseAction={() => setEditingUser(null)} openButton={false} />
-      )}
-
+      {editingUser && <FormModal editingUser={editingUser} onCloseAction={handleCloseFormModal} openButton={false} />}
       <DeleteModal
         open={deleteModalOpen}
         user={userToDelete}

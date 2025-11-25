@@ -9,13 +9,15 @@ import type { UserFormValues } from '@/validation';
 
 const { Option } = Select;
 
-type ChiefSelect = {
+type ChiefSelectProps = {
   control: Control<UserFormValues>;
   allowedManagers: User[];
   currentRole: string;
 };
 
-export const ChiefSelect: FC<ChiefSelect> = ({ control, allowedManagers, currentRole }) => {
+export const ChiefSelect: FC<ChiefSelectProps> = ({ control, allowedManagers, currentRole }) => {
+  const isAdmin = currentRole === 'Администратор';
+
   return (
     <FormField
       name='chiefId'
@@ -28,7 +30,7 @@ export const ChiefSelect: FC<ChiefSelect> = ({ control, allowedManagers, current
           value={value}
           onChange={onChange}
           key={currentRole}
-          disabled={currentRole === 'Администратор'}
+          disabled={isAdmin}
         >
           {allowedManagers.map((user) => (
             <Option key={user.id} value={user.id}>

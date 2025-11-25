@@ -100,15 +100,19 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
     }
   };
 
+  const modalTitle = editingUser ? 'Редактировать пользователя' : 'Добавить пользователя';
+
+  const okText = editingUser ? 'Сохранить' : 'Добавить';
+
   return (
     <>
       {openButton && <OpenButton onClick={openModal} loading={loading} />}
       <Modal
-        title={editingUser ? 'Редактировать пользователя' : 'Добавить пользователя'}
+        title={modalTitle}
         open={isModalOpen}
         onOk={handleSubmit(onSubmit)}
         onCancel={closeModal}
-        okText={editingUser ? 'Сохранить' : 'Добавить'}
+        okText={okText}
         cancelText='Отмена'
       >
         <Form layout='vertical'>

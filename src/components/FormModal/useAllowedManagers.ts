@@ -14,6 +14,7 @@ export const useAllowedChiefs = (users: User[], currentRole: Role, editingUser?:
         map[user.chiefId].push(user.id);
       }
     });
+
     return map;
   };
 
