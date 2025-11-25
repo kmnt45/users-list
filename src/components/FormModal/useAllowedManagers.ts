@@ -26,6 +26,7 @@ export const useAllowedChiefs = (users: User[], currentRole: Role, editingUser?:
       const directSubs = subordinateMap[currentId] || [];
 
       if (directSubs.includes(candidateId)) return false;
+
       return directSubs.every((sub) => isNotSubordinate(candidateId, sub));
     };
 

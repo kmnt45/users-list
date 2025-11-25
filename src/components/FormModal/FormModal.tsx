@@ -16,6 +16,7 @@ import { useAppSelector } from '@/hooks/useAppSelector';
 import type { User } from '@/models';
 import { addUser, updateUser } from '@/service';
 import { selectUsers } from '@/slices';
+import { isChiefValid } from '@/utils';
 import { userSchema, type UserFormValues } from '@/validation';
 
 const { Option } = Select;
@@ -53,13 +54,15 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
     }
   }, [editingUser, reset]);
 
+  const chiefId = watch('chiefId');
+
   useEffect(() => {
-    const manager = users.find((user) => user.id === watch('chiefId'));
+    const manager = users.find((user) => user.id === chiefId);
 
     if (manager && roles.indexOf(manager.role) <= roles.indexOf(currentRole)) {
       setValue('chiefId', '');
     }
-  }, [currentRole, setValue, users, watch]);
+  }, [currentRole, setValue, users, chiefId]);
 
   const openModal = () => setIsModalOpen(true);
 
@@ -79,6 +82,14 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
     try {
       if (editingUser) {
         await dispatch(updateUser({ ...editingUser, ...data })).unwrap();
+
+        const subordinates = users.filter((user) => user.chiefId === editingUser.id);
+
+        for (const sub of subordinates) {
+          if (!isChiefValid(data.role, sub.role)) {
+            await dispatch(updateUser({ ...sub, chiefId: '' })).unwrap();
+          }
+        }
       } else {
         await dispatch(addUser(data)).unwrap();
       }

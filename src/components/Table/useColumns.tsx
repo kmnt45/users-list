@@ -26,7 +26,7 @@ const chiefFilters = [
 const renderChief = (users: User[], chiefId?: string, currentRole?: Role) => {
   if (!chiefId || !currentRole) return '-';
 
-  const manager = users.find((u) => u.id === chiefId);
+  const manager = users.find((user) => user.id === chiefId);
 
   if (!manager) return '-';
 
