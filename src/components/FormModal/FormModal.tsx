@@ -118,13 +118,7 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
               </Select>
             )}
           />
-          <ChiefSelect
-            control={control}
-            allowedManagers={allowedManagers}
-            editingUser={editingUser}
-            users={users}
-            currentRole={currentRole}
-          />
+          <ChiefSelect control={control} allowedManagers={allowedManagers} currentRole={currentRole} />
         </Form>
       </Modal>
     </>

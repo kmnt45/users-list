@@ -12,18 +12,10 @@ const { Option } = Select;
 type ChiefSelect = {
   control: Control<UserFormValues>;
   allowedManagers: User[];
-  editingUser?: User;
-  users: User[];
   currentRole: string;
 };
 
-export const ChiefSelect: FC<ChiefSelect> = ({ control, allowedManagers, editingUser, users, currentRole }) => {
-  const showCurrentChief = Boolean(
-    editingUser?.chiefId && !allowedManagers.find((user) => user.id === editingUser.chiefId),
-  );
-
-  const currentChiefName = users.find((user) => user.id === editingUser?.chiefId)?.name || 'Неизвестный';
-
+export const ChiefSelect: FC<ChiefSelect> = ({ control, allowedManagers, currentRole }) => {
   return (
     <FormField
       name='chiefId'
@@ -38,11 +30,6 @@ export const ChiefSelect: FC<ChiefSelect> = ({ control, allowedManagers, editing
           key={currentRole}
           disabled={currentRole === 'Администратор'}
         >
-          {showCurrentChief && (
-            <Option key={editingUser!.chiefId} value={editingUser!.chiefId}>
-              {currentChiefName} (текущий)
-            </Option>
-          )}
           {allowedManagers.map((user) => (
             <Option key={user.id} value={user.id}>
               {user.name} ({user.role})
