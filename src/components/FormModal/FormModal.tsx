@@ -2,16 +2,20 @@
 
 import { type FC, useEffect, useState } from 'react';
 
-import { UserAddOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Modal, Button, Select, Form } from 'antd';
+import { Modal, Select, Form } from 'antd';
 import { useForm } from 'react-hook-form';
 
+import { ChiefSelect } from '@/components/ChiefSelect';
 import { FormField } from '@/components/FormField';
+import { useAllowedChiefs } from '@/components/FormModal/useAllowedManagers';
+import { OpenButton } from '@/components/OpenButton';
 import { roles } from '@/constants';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
+import { useAppSelector } from '@/hooks/useAppSelector';
 import type { User } from '@/models';
 import { addUser, updateUser } from '@/service';
+import { selectUsers } from '@/slices';
 import { userSchema, type UserFormValues } from '@/validation';
 
 const { Option } = Select;
@@ -25,20 +29,21 @@ type FormModalProps = {
 export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, openButton = true }) => {
   const dispatch = useAppDispatch();
 
+  const users = useAppSelector(selectUsers);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
-  const { control, handleSubmit, reset } = useForm<UserFormValues>({
+  const { control, handleSubmit, reset, watch, setValue } = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
-      role: roles[0],
-    },
+    defaultValues: { name: '', email: '', phone: '', role: roles[0], chiefId: '' },
     mode: 'onBlur',
   });
+
+  const currentRole = watch('role');
+
+  const allowedManagers = useAllowedChiefs(users, currentRole, editingUser);
 
   useEffect(() => {
     if (editingUser) {
@@ -47,6 +52,14 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
       setIsModalOpen(true);
     }
   }, [editingUser, reset]);
+
+  useEffect(() => {
+    const manager = users.find((user) => user.id === watch('chiefId'));
+
+    if (manager && roles.indexOf(manager.role) <= roles.indexOf(currentRole)) {
+      setValue('chiefId', '');
+    }
+  }, [currentRole, setValue, users, watch]);
 
   const openModal = () => setIsModalOpen(true);
 
@@ -78,18 +91,7 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
 
   return (
     <>
-      {openButton && (
-        <Button
-          size='large'
-          type='primary'
-          onClick={openModal}
-          icon={<UserAddOutlined />}
-          loading={loading}
-          disabled={loading}
-        >
-          Добавить пользователя
-        </Button>
-      )}
+      {openButton && <OpenButton onClick={openModal} loading={loading} />}
       <Modal
         title={editingUser ? 'Редактировать пользователя' : 'Добавить пользователя'}
         open={isModalOpen}
@@ -115,6 +117,13 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
                 ))}
               </Select>
             )}
+          />
+          <ChiefSelect
+            control={control}
+            allowedManagers={allowedManagers}
+            editingUser={editingUser}
+            users={users}
+            currentRole={currentRole}
           />
         </Form>
       </Modal>

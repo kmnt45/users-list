@@ -1,18 +1,18 @@
 'use client';
 
-import { type FC, useEffect, useState } from 'react';
+import { type FC, useCallback, useEffect, useState } from 'react';
 
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Table as AntTable, Button, Space, InputNumber } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import { Table as AntTable, InputNumber } from 'antd';
 
+import { DeleteModal } from '@/components/DeleteModal';
 import { FormModal } from '@/components/FormModal';
-import { Tooltip } from '@/components/Tooltip';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import type { User } from '@/models';
-import { fetchUsers, deleteUser } from '@/service';
+import { fetchUsers, deleteUser, updateUser } from '@/service';
 import { selectLoading, selectUsersReversed } from '@/slices';
+
+import { useColumns } from './useColumns';
 
 export const Table: FC = () => {
   const dispatch = useAppDispatch();
@@ -23,6 +23,12 @@ export const Table: FC = () => {
 
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+
+  const [subordinates, setSubordinates] = useState<User[]>([]);
+
   const [pageSize, setPageSize] = useState(10);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,15 +37,48 @@ export const Table: FC = () => {
     dispatch(fetchUsers());
   }, []);
 
-  const handleDelete = (id: string) => () => {
-    dispatch(deleteUser(id));
+  const handleEdit = useCallback((user: User) => {
+    setEditingUser(user);
+  }, []);
+
+  const handleDelete = useCallback(
+    (user: User) => {
+      const subs = users.filter((u) => u.chiefId === user.id);
+
+      setUserToDelete(user);
+      setSubordinates(subs);
+      setDeleteModalOpen(true);
+    },
+    [users],
+  );
+
+  const columns = useColumns({
+    users,
+    handleEdit,
+    handleDelete,
+  });
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+
+    await Promise.all(subordinates.map((sub) => dispatch(updateUser({ ...sub, chiefId: undefined })).unwrap()));
+
+    await dispatch(deleteUser(userToDelete.id)).unwrap();
+
+    setDeleteModalOpen(false);
+
+    setUserToDelete(null);
+
+    setSubordinates([]);
   };
 
-  const handleClose = () => {
-    setEditingUser(null);
-  };
+  const handleCancelDelete = () => {
+    setDeleteModalOpen(false);
 
-  const handleEdit = (user: User) => () => setEditingUser(user);
+    setUserToDelete(null);
+
+    setSubordinates([]);
+  };
 
   const handlePageChange = (page: number, size?: number) => {
     setCurrentPage(page);
@@ -52,87 +91,6 @@ export const Table: FC = () => {
 
     setCurrentPage(1);
   };
-
-  const emailFilters = Array.from(new Set(users.map((user) => user.email.split('@')[1]))).map((domain) => ({
-    text: domain,
-    value: domain,
-  }));
-
-  const roleFilters = Array.from(new Set(users.map((user) => user.role))).map((role) => ({
-    text: role,
-    value: role,
-  }));
-
-  const columns: ColumnsType<User> = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 50,
-      showSorterTooltip: false,
-      sorter: (a, b) => Number(a.id) - Number(b.id),
-    },
-    {
-      title: 'Имя',
-      dataIndex: 'name',
-      key: 'name',
-      width: 150,
-      ellipsis: { showTitle: false },
-      showSorterTooltip: false,
-      render: (name) => <Tooltip title={name} />,
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-      width: 200,
-      ellipsis: { showTitle: false },
-      showSorterTooltip: false,
-      render: (email) => <Tooltip title={email} />,
-      sorter: (a, b) => a.email.localeCompare(b.email),
-      filters: emailFilters,
-      onFilter: (value, record) => record.email.endsWith(value as string),
-    },
-    {
-      title: 'Телефон',
-      dataIndex: 'phone',
-      key: 'phone',
-      width: 140,
-      ellipsis: { showTitle: false },
-      showSorterTooltip: false,
-      render: (phone) => <Tooltip title={phone} />,
-      sorter: (a, b) => a.phone.localeCompare(b.phone),
-      filters: [
-        { text: '+7', value: '+7' },
-        { text: '8', value: '8' },
-      ],
-      onFilter: (value, record) => record.phone.startsWith(value as string),
-    },
-    {
-      title: 'Роль',
-      dataIndex: 'role',
-      key: 'role',
-      width: 100,
-      ellipsis: { showTitle: false },
-      showSorterTooltip: false,
-      render: (role) => <Tooltip title={role} />,
-      sorter: (a, b) => a.role.localeCompare(b.role),
-      filters: roleFilters,
-      onFilter: (value, record) => record.role === value,
-    },
-    {
-      title: 'Действия',
-      key: 'actions',
-      width: 120,
-      render: (_, record: User) => (
-        <Space>
-          <Button icon={<EditOutlined />} onClick={handleEdit(record)} />
-          <Button icon={<DeleteOutlined />} onClick={handleDelete(record.id)} danger />
-        </Space>
-      ),
-    },
-  ];
 
   return (
     <div>
@@ -156,7 +114,17 @@ export const Table: FC = () => {
           </div>
         )}
       />
-      {editingUser && <FormModal editingUser={editingUser} onCloseAction={handleClose} openButton={false} />}
+
+      {editingUser && (
+        <FormModal editingUser={editingUser} onCloseAction={() => setEditingUser(null)} openButton={false} />
+      )}
+
+      <DeleteModal
+        open={deleteModalOpen}
+        user={userToDelete}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };

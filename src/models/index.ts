@@ -8,6 +8,7 @@ export type User = {
   email: string;
   phone: string;
   role: Role;
+  chiefId?: string;
 };
 
 export type NewUser = Omit<User, 'id'>;
