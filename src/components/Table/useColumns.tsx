@@ -39,12 +39,12 @@ const renderChief = (users: User[], chiefId?: string, currentRole?: Role) => {
 
 export const useColumns = ({ users, handleEdit, handleDelete }: UseColumnsProps): ColumnsType<User> => {
   return useMemo(() => {
-    const emailFilters = Array.from(new Set(users.map((u) => u.email.split('@')[1]))).map((domain) => ({
+    const emailFilters = Array.from(new Set(users.map((user) => user.email.split('@')[1]))).map((domain) => ({
       text: domain,
       value: domain,
     }));
 
-    const roleFilters = Array.from(new Set(users.map((u) => u.role))).map((role) => ({
+    const roleFilters = Array.from(new Set(users.map((user) => user.role))).map((role) => ({
       text: role,
       value: role,
     }));
