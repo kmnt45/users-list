@@ -4,7 +4,8 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Button, Space, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
-import type { User } from '@/models';
+import type { Role, User } from '@/models';
+import { isChiefValid } from '@/utils';
 
 type UseColumnsProps = {
   users: User[];
@@ -22,11 +23,18 @@ const chiefFilters = [
   { text: 'Нет начальника', value: 'none' },
 ];
 
-const renderChief = (users: User[], chiefId?: string) => {
-  if (!chiefId) return '-';
+const renderChief = (users: User[], chiefId?: string, currentRole?: Role) => {
+  if (!chiefId || !currentRole) return '-';
+
   const manager = users.find((u) => u.id === chiefId);
 
-  return manager ? <Tooltip title={`${manager.name} (${manager.role})`}>{manager.name}</Tooltip> : '-';
+  if (!manager) return '-';
+
+  return isChiefValid(manager.role, currentRole) ? (
+    <Tooltip title={`${manager.name} (${manager.role})`}>{manager.name}</Tooltip>
+  ) : (
+    '-'
+  );
 };
 
 export const useColumns = ({ users, handleEdit, handleDelete }: UseColumnsProps): ColumnsType<User> => {
@@ -93,7 +101,7 @@ export const useColumns = ({ users, handleEdit, handleDelete }: UseColumnsProps)
         width: 150,
         filters: chiefFilters,
         onFilter: (value, record) => (value === 'has' ? !!record.chiefId : !record.chiefId),
-        render: (chiefId: string) => renderChief(users, chiefId),
+        render: (chiefId: string, record) => renderChief(users, chiefId, record.role),
       },
       {
         title: 'Действия',
