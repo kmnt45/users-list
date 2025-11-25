@@ -26,12 +26,12 @@ const chiefFilters = [
 const renderChief = (users: User[], chiefId?: string, currentRole?: Role) => {
   if (!chiefId || !currentRole) return '-';
 
-  const manager = users.find((user) => user.id === chiefId);
+  const chief = users.find((user) => user.id === chiefId);
 
-  if (!manager) return '-';
+  if (!chief) return '-';
 
-  return isChiefValid(manager.role, currentRole) ? (
-    <Tooltip title={`${manager.name} (${manager.role})`}>{manager.name}</Tooltip>
+  return isChiefValid(chief.role, currentRole) ? (
+    <Tooltip title={`${chief.name} (${chief.role})`}>{chief.name}</Tooltip>
   ) : (
     '-'
   );

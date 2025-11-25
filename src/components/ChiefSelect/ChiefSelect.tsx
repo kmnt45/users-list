@@ -11,11 +11,11 @@ const { Option } = Select;
 
 type ChiefSelectProps = {
   control: Control<UserFormValues>;
-  allowedManagers: User[];
+  allowedChiefs: User[];
   currentRole: string;
 };
 
-export const ChiefSelect: FC<ChiefSelectProps> = ({ control, allowedManagers, currentRole }) => {
+export const ChiefSelect: FC<ChiefSelectProps> = ({ control, allowedChiefs, currentRole }) => {
   const isAdmin = currentRole === 'Администратор';
 
   return (
@@ -32,7 +32,7 @@ export const ChiefSelect: FC<ChiefSelectProps> = ({ control, allowedManagers, cu
           key={currentRole}
           disabled={isAdmin}
         >
-          {allowedManagers.map((user) => (
+          {allowedChiefs.map((user) => (
             <Option key={user.id} value={user.id}>
               {user.name} ({user.role})
             </Option>

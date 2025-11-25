@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 
 import { ChiefSelect } from '@/components/ChiefSelect';
 import { FormField } from '@/components/FormField';
-import { useAllowedChiefs } from '@/components/FormModal/useAllowedManagers';
+import { useAllowedChiefs } from '@/components/FormModal/useAllowedChiefs';
 import { OpenButton } from '@/components/OpenButton';
 import { roles } from '@/constants';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
@@ -44,7 +44,7 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
 
   const currentRole = watch('role');
 
-  const allowedManagers = useAllowedChiefs(users, currentRole, editingUser);
+  const allowedChiefs = useAllowedChiefs(users, currentRole, editingUser);
 
   useEffect(() => {
     if (editingUser) {
@@ -57,9 +57,9 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
   const chiefId = watch('chiefId');
 
   useEffect(() => {
-    const manager = users.find((user) => user.id === chiefId);
+    const chief = users.find((user) => user.id === chiefId);
 
-    if (manager && roles.indexOf(manager.role) <= roles.indexOf(currentRole)) {
+    if (chief && roles.indexOf(chief.role) <= roles.indexOf(currentRole)) {
       setValue('chiefId', '');
     }
   }, [currentRole, setValue, users, chiefId]);
@@ -133,7 +133,7 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
               </Select>
             )}
           />
-          <ChiefSelect control={control} allowedManagers={allowedManagers} currentRole={currentRole} />
+          <ChiefSelect control={control} allowedChiefs={allowedChiefs} currentRole={currentRole} />
         </Form>
       </Modal>
     </>
