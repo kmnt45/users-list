@@ -100,7 +100,7 @@ export const useColumns = ({ users, handleEdit, handleDelete }: UseColumnsProps)
         key: 'actions',
         width: 120,
         render: (_, record) => {
-          const hasSubordinates = users.some((u) => u.chiefId === record.id);
+          const hasSubordinates = users.some((user) => user.chiefId === record.id);
 
           return (
             <Space>

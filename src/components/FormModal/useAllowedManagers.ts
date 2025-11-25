@@ -4,20 +4,24 @@ import { roles } from '@/constants';
 import type { Role, User } from '@/models';
 
 export const useAllowedChiefs = (users: User[], currentRole: Role, editingUser?: User) => {
+  const buildSubordinateMap = (users: User[]) => {
+    const map: Record<string, string[]> = {};
+
+    users.forEach((user) => {
+      if (user.chiefId) {
+        if (!map[user.chiefId]) map[user.chiefId] = [];
+
+        map[user.chiefId].push(user.id);
+      }
+    });
+    return map;
+  };
+
+  const isRoleLowerOrEqual = (a: Role, b: Role) => roles.indexOf(a) <= roles.indexOf(b);
+
   return useMemo(() => {
     if (!users.length) return [];
 
-    const buildSubordinateMap = (users: User[]) => {
-      const map: Record<string, string[]> = {};
-
-      users.forEach((user) => {
-        if (user.chiefId) {
-          if (!map[user.chiefId]) map[user.chiefId] = [];
-          map[user.chiefId].push(user.id);
-        }
-      });
-      return map;
-    };
     const subordinateMap = buildSubordinateMap(users);
 
     const isNotSubordinate = (candidateId: string, currentId: string): boolean => {
@@ -30,7 +34,7 @@ export const useAllowedChiefs = (users: User[], currentRole: Role, editingUser?:
     return users.filter((user) => {
       if (editingUser?.id === user.id) return false;
 
-      if (roles.indexOf(user.role) <= roles.indexOf(currentRole)) return false;
+      if (isRoleLowerOrEqual(user.role, currentRole)) return false;
 
       if (editingUser) {
         return isNotSubordinate(user.id, editingUser.id);

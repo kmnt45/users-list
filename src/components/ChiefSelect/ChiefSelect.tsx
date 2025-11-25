@@ -22,7 +22,7 @@ export const ChiefSelect: FC<ChiefSelect> = ({ control, allowedManagers, editing
     editingUser?.chiefId && !allowedManagers.find((user) => user.id === editingUser.chiefId),
   );
 
-  const currentChiefName = users.find((u) => u.id === editingUser?.chiefId)?.name || 'Неизвестный';
+  const currentChiefName = users.find((user) => user.id === editingUser?.chiefId)?.name || 'Неизвестный';
 
   return (
     <FormField
