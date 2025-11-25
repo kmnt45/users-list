@@ -2,10 +2,11 @@
 
 import { type FC, useCallback, useEffect, useState } from 'react';
 
-import { Table as AntTable, InputNumber } from 'antd';
+import { Table as AntTable } from 'antd';
 
 import { DeleteModal } from '@/components/DeleteModal';
 import { FormModal } from '@/components/FormModal';
+import { PageSizeSelector } from '@/components/PageSizeSelector';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import type { User } from '@/models';
@@ -46,7 +47,9 @@ export const Table: FC = () => {
       const subs = users.filter((u) => u.chiefId === user.id);
 
       setUserToDelete(user);
+
       setSubordinates(subs);
+
       setDeleteModalOpen(true);
     },
     [users],
@@ -107,12 +110,7 @@ export const Table: FC = () => {
           onChange: handlePageChange,
         }}
         scroll={{ x: '100%' }}
-        footer={() => (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
-            <span>Записей на странице:</span>
-            <InputNumber min={1} max={100} value={pageSize} onChange={handlePageSizeChange} style={{ width: 70 }} />
-          </div>
-        )}
+        footer={() => <PageSizeSelector pageSize={pageSize} onChange={handlePageSizeChange} />}
       />
 
       {editingUser && (

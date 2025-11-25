@@ -9,6 +9,7 @@ export const useAllowedChiefs = (users: User[], currentRole: Role, editingUser?:
 
     const buildSubordinateMap = (users: User[]) => {
       const map: Record<string, string[]> = {};
+
       users.forEach((user) => {
         if (user.chiefId) {
           if (!map[user.chiefId]) map[user.chiefId] = [];
@@ -21,6 +22,7 @@ export const useAllowedChiefs = (users: User[], currentRole: Role, editingUser?:
 
     const isNotSubordinate = (candidateId: string, currentId: string): boolean => {
       const directSubs = subordinateMap[currentId] || [];
+
       if (directSubs.includes(candidateId)) return false;
       return directSubs.every((sub) => isNotSubordinate(candidateId, sub));
     };
