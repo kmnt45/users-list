@@ -85,11 +85,13 @@ export const FormModal: FC<FormModalProps> = ({ editingUser, onCloseAction, open
 
         const subordinates = users.filter((user) => user.chiefId === editingUser.id);
 
-        for (const sub of subordinates) {
-          if (!isChiefValid(data.role, sub.role)) {
-            await dispatch(updateUser({ ...sub, chiefId: '' })).unwrap();
-          }
-        }
+        const subordinatesToUpdate = subordinates.filter((sub) => !isChiefValid(data.role, sub.role));
+
+        const updatePromises = subordinatesToUpdate.map((sub) =>
+          dispatch(updateUser({ ...sub, chiefId: '' })).unwrap(),
+        );
+
+        await Promise.all(updatePromises);
       } else {
         await dispatch(addUser(data)).unwrap();
       }
