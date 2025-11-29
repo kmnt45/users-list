@@ -9,6 +9,9 @@ import '../styles/globals.scss';
 
 export const metadata: Metadata = {
   title: 'Список пользователей',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
